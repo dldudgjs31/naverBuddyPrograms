@@ -7,12 +7,16 @@
 
 
 from PyQt6 import QtCore, QtGui, QtWidgets
-
+from PyQt6.QtGui import QFont,QFontDatabase
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(678, 544)
+        # id = QFontDatabase.addApplicationFont("./font/Jua-Regular.ttf")
+        # families = QFontDatabase.applicationFontFamilies(id)
+        # font1 = QFont(families[0])
+
         self.centralwidget = QtWidgets.QWidget(parent=MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.stackedWidget = QtWidgets.QStackedWidget(parent=self.centralwidget)
@@ -199,7 +203,9 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.stackedWidget.setCurrentIndex(1)
+        self.stackedWidget.setCurrentIndex(0)
+        self.pushButton_start.setFont(font)
+        self.pushButton_stop.setFont(font)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
