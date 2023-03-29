@@ -31,7 +31,7 @@ class NaverBlogBuddyBot:
         time.sleep(2)
         pp.copy(my_id)
         time.sleep(2)
-        id_input.send_keys(Keys.CONTROL, 'v')
+        id_input.send_keys(Keys.COMMAND, 'v')
 
     def open_blog(self, url):
         self.driver.execute_script(f"window.open('{url}');")
@@ -71,51 +71,55 @@ class NaverBlogBuddyBot:
         pp.copy(self.buddy_intro.format(nickname=nickname))
         message = self.driver.find_elements(By.XPATH, "//textarea[@ng-model='data.inviteMessage']")
         message[0].click()
-        message[0].send_keys(Keys.CONTROL, 'a')
-        message[0].send_keys(Keys.CONTROL, 'v')
+        message[0].send_keys(Keys.COMMAND, 'a')
+        message[0].send_keys(Keys.COMMAND, 'v')
 
     def check_duplicated_buddy(self):
-        time.sleep(2)
-        message = self.driver.find_elements(By.XPATH, "//*[@id='lyr4']/div/div[1]/p")
-        if len(message) > 0:
-            print("이미 서이추 신청한 계정입니다.")
+        try:
+            time.sleep(2)
+            message = self.driver.find_elements(By.XPATH, "//*[@id='lyr4']/div/div[1]/p")
+            if len(message) > 0:
+                print("이미 서이추 신청한 계정입니다.")
+                return False
+            else:
+                print("아직 서이추 신청 안한 계정입니다.")
+                return True
+        except Exception as e:
+            print(e)
             return False
-        else:
-            print("아직 서이추 신청 안한 계정입니다.")
-            return True
+
     def click_ok_btn(self, nickname):
         time.sleep(3)
         btn = self.driver.find_elements(By.XPATH, '//a[@class="btn_ok"]')
         btn[0].click()
         print(nickname + "님 서이추 완료")
-
-    def run(self):
+    def first_login(self,id,pwd):
         self.driver.get("https://nid.naver.com/nidlogin.login?svctype=262144&url=http://m.naver.com/aside/")
         time.sleep(2)
-        self.input_keys(self.naver_id, "아이디")
-        self.input_keys(self.naver_password, "비밀번호")
+        self.input_keys(id, "아이디")
+        time.sleep(2)
+        self.input_keys(pwd, "비밀번호")
+        time.sleep(2)
         self.driver.find_element(By.XPATH, f"//input[@placeholder='비밀번호']").send_keys(Keys.ENTER)
-        time.sleep(30)
 
-        # 1. 네이버 view 키워드 검색(블로그/최신글)
-        blog_search_url = "https://m.search.naver.com/search.naver?where=m_blog&query=" + self.keyword + "&nso=so%3Add%2Cp%3Aall"
+    def searchKeyword(self,keyword):
+        blog_search_url = "https://m.search.naver.com/search.naver?where=m_blog&query=" + keyword + "&nso=so%3Add%2Cp%3Aall"
         self.driver.get(blog_search_url)
 
-        # 2. 원하는 수량 만큼 스크롤 진행(max 100)
-        total_posts = len(self.driver.find_elements(By.XPATH, "//ul[@class='lst_total _list_base'][@id='addParemt']/li"))
-        print("초기 글 개수 : "+ str(total_posts))
-        while total_posts < self.max_buddies:
-            SCROLL_PAUSE_TIME = 1
+    def total_post(self,max_buddies):
+        total_posts = len(
+            self.driver.find_elements(By.XPATH, "//ul[@class='lst_total _list_base'][@id='addParemt']/li"))
+        print("초기 글 개수 : " + str(total_posts))
+        while total_posts < max_buddies + 50:
             self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            time.sleep(SCROLL_PAUSE_TIME)
-            total_posts = len(self.driver.find_elements(By.XPATH, "//ul[@class='lst_total _list_base'][@id='addParemt']/li"))
+            time.sleep(2)
+            total_posts = len(
+                self.driver.find_elements(By.XPATH, "//ul[@class='lst_total _list_base'][@id='addParemt']/li"))
             print(total_posts)
-        print(total_posts)
-
-        # 3. 해당 스크롤만큼의 블로그 id 저장하기 (이때 중복인 경우 스킵)
+        return total_posts
+    def save_id_nickname(self,max_buddies):
         nickname = list()
         real_id = list()
-        buddy_cnt = 0
         for x in range(self.max_buddies):
             # id 추출
             url = self.driver.find_elements(By.XPATH, '//span[@class="elss etc_dsc_inner"]/a[@class="sub_txt sub_name"]')
@@ -126,8 +130,53 @@ class NaverBlogBuddyBot:
             name = self.driver.find_elements(By.XPATH, '//span[@class="elss etc_dsc_inner"]/a[@class="sub_txt sub_name"]')
             name =name[x].text
             nickname.append(name)
+        return nickname,real_id
+    def buddy_form(self,real_id):
+        url = f"https://m.blog.naver.com/BuddyAddForm.naver?blogId={real_id}"
+        self.open_blog(url)
+    def run(self):
+        # self.driver.get("https://nid.naver.com/nidlogin.login?svctype=262144&url=http://m.naver.com/aside/")
+        # time.sleep(2)
+        # self.input_keys(self.naver_id, "아이디")
+        # self.input_keys(self.naver_password, "비밀번호")
+        # self.driver.find_element(By.XPATH, f"//input[@placeholder='비밀번호']").send_keys(Keys.ENTER)
+        self.first_login(self.naver_id,self.naver_password)
+        time.sleep(2)
+
+        # 1. 네이버 view 키워드 검색(블로그/최신글)
+        self.searchKeyword(self.keyword)
+        # blog_search_url = "https://m.search.naver.com/search.naver?where=m_blog&query=" + self.keyword + "&nso=so%3Add%2Cp%3Aall"
+        # self.driver.get(blog_search_url)
+
+        # 2. 원하는 수량 만큼 스크롤 진행(max 100)
+        total_posts = self.total_post(self.max_buddies)
+        # total_posts = len(self.driver.find_elements(By.XPATH, "//ul[@class='lst_total _list_base'][@id='addParemt']/li"))
+        # print("초기 글 개수 : "+ str(total_posts))
+        # while total_posts < self.max_buddies+50:
+        #     SCROLL_PAUSE_TIME = 1
+        #     self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        #     time.sleep(SCROLL_PAUSE_TIME)
+        #     total_posts = len(self.driver.find_elements(By.XPATH, "//ul[@class='lst_total _list_base'][@id='addParemt']/li"))
+        # print(total_posts)
+
+        # 3. 해당 스크롤만큼의 블로그 id 저장하기 (이때 중복인 경우 스킵)
+        nickname,real_id = self.save_id_nickname(self.max_buddies)
+        # nickname = list()
+        # real_id = list()
+        # buddy_cnt = 0
+        # for x in range(self.max_buddies):
+        #     # id 추출
+        #     url = self.driver.find_elements(By.XPATH, '//span[@class="elss etc_dsc_inner"]/a[@class="sub_txt sub_name"]')
+        #     url = (url[x].get_attribute('href'))
+        #     user_id = url[url.rfind('/') + 1:]
+        #     real_id.append(user_id)
+        #     # 닉네임 추출
+        #     name = self.driver.find_elements(By.XPATH, '//span[@class="elss etc_dsc_inner"]/a[@class="sub_txt sub_name"]')
+        #     name =name[x].text
+        #     nickname.append(name)
 
         # 4. 1번부터 for통해 새창열기 https://m.blog.naver.com/BuddyAddForm.naver?blogId=dldudgjs31
+        buddy_cnt = 0
         for x in range(len(real_id)):
             url = f"https://m.blog.naver.com/BuddyAddForm.naver?blogId={real_id[x]}"
             self.open_blog(url)

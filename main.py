@@ -95,13 +95,31 @@ class bott():
         buddy_intro = '{nickname}님 안녕하세요~! 이초코와 최야삐입니다:) 강릉 관련 글 보고 이렇게 인사드립니다. 서로 이웃으로 정보 공유하면서 소통해요~!'
         naver_id = 'rhksdir12'
         naver_password = 'tkfkdgo!!'
+        print(ui.checkBox_securityYN.isChecked())
         try:
-            ui.textEdit_intro.append(str(self.user_start_dt))
-            ui.textEdit_intro.append(str(self.user_end_dt))
-            ui.textEdit_intro.append(self.user_id)
+            #로그인
+            ui.plainTextEdit_log.appendPlainText("네이버 로그인 시작")
+            bot = NaverBlogBuddyBot(keyword, max_buddies, buddy_intro, naver_id, naver_password)
+            bot.first_login(naver_id,naver_password)
+            ui.plainTextEdit_log.appendPlainText("네이버 로그인 완료 (보안 퀴즈 나올시 보안퀴즈 여부 체크 후 재실행")
+            time.sleep(2)
+            #키워드 검색
+            ui.plainTextEdit_log.appendPlainText(f"'{keyword}' 키워드 검색 시작")
+            bot.searchKeyword(keyword)
+            #목표 수량 읽기
+            total_posts = bot.total_post(max_buddies)
+            #목표 수량 만큼 id/nickname 저장
+            nickname, real_id = bot.save_id_nickname(max_buddies)
+            print(nickname)
+            print(real_id)
+            ui.plainTextEdit_log.appendPlainText(f"'{keyword}' 키워드 검색 완료")
+            buddy_cnt = 0
+            num_cnt = 0
+            # while buddy_cnt < max_buddies:
+            #     # 서이추 창 열기
+            #     bot.buddy_form(real_id[num_cnt])
         except Exception as e:
             print(e)
-
         # 진행바 셋업
         # print(ui.progressBar.value())
         # ui.progressBar.setValue(ui.progressBar.value()+1)
