@@ -1,9 +1,13 @@
+import traceback
+
 import selenium
 from PyQt6 import QtCore, QtWidgets
+from PyQt6.QtCore import *
 import naver
 from buddy import *
 from PyQt6.QtWidgets import QPushButton, QMessageBox
 import pymysql
+import threading
 
 class bott():
     user_id = ''
@@ -88,6 +92,8 @@ class bott():
         # currentpage = ui.stackedWidget.currentIndex()
         # ui.stackedWidget.setCurrentIndex(currentpage+1)
 
+    def logging(self,text):
+        ui.plainTextEdit_log.appendPlainText(text)
     def start(self):
         print("start....")
         keyword = '강릉 데이트'
@@ -98,12 +104,13 @@ class bott():
         print(ui.checkBox_securityYN.isChecked())
         try:
             #로그인
-            ui.plainTextEdit_log.appendPlainText("네이버 로그인 시작")
+            # ui.plainTextEdit_log.appendPlainText("네이버 로그인 시작")
             bot = NaverBlogBuddyBot(keyword, max_buddies, buddy_intro, naver_id, naver_password)
             bot.first_login(naver_id,naver_password)
-            ui.plainTextEdit_log.appendPlainText("네이버 로그인 완료 (보안 퀴즈 나올시 보안퀴즈 여부 체크 후 재실행")
+            ##로그 남기기            ui.plainTextEdit_log.appendPlainText("네이버 로그인 완료 (보안 퀴즈 나올시 보안퀴즈 여부 체크 후 재실행")
             time.sleep(2)
             #키워드 검색
+
             ui.plainTextEdit_log.appendPlainText(f"'{keyword}' 키워드 검색 시작")
             bot.searchKeyword(keyword)
             #목표 수량 읽기
