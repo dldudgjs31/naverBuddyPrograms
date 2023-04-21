@@ -74,7 +74,8 @@ def clickBuddyRadio():
 
 def introBuddy(nickname):
     time.sleep(2)
-    pp.copy(bothBuddyIntro.format(nickname=nickname))
+    selectedIntro = bothBuddyIntro[int(random.uniform(0,len(bothBuddyIntro)-1))]
+    pp.copy(selectedIntro.format(nickname=nickname))
     message = driver.find_elements(By.XPATH, "//textarea[@ng-model='data.inviteMessage']")
     message[0].click()
     message[0].send_keys(Keys.CONTROL, 'a')
@@ -127,14 +128,49 @@ def clickOkBtn():
     except Exception as e:
         print(e)
 
+def changeBuddyGroup(value):
+    group_select = driver.find_elements(By.XPATH, '//*[@id="buddyGroupSelect"]')
+    group_options = Select(group_select[0])
+    group_options.select_by_value(str(value))
 
+
+def checkErrorPage():
+    ##/html/body/ui-view/div/h1/strong
+    time.sleep(2)
+    answer=""
+    errorPage = driver.find_elements(By.XPATH, '//h1[@class="error_h1"]')
+    if len(errorPage) > 0:
+        print("에러페이지")
+        answer = "true"
+        return answer
+    else:
+        answer = "false"
+        return answer
+
+def checkMaxBuddy():
+    time.sleep(2)
+    checkBuddy = driver.find_elements(By.XPATH, '//*[@id="lyr6"]/div/div[1]/p')
+    if len(checkBuddy)>0:
+        comment = checkBuddy[0].text
+        print(comment)
+        if comment == '하루에 신청 가능한 이웃수가 초과되어 더이상 이웃을 추가할 수 없습니다.':
+            driver.quit()
+            return True
+        else:
+            return False
+
+    return False
 
 # 서이추 추가 방법 1 : 관련 키워드 검색 후 추가
 # input data : keyword / 이웃 수 설정(one day : max 100) / 서이추 인사말
 # output data : 서이추 성공시 {userid} 서이추 추가 완료 (num/100) log 설정 필요
-searchKeyword = '강릉 여행'
-bothBuddyMax = 10
-bothBuddyIntro = '{nickname}님 안녕하세요~! 이초코와 최야삐입니다:) 강릉 관련 글 보고 이렇게 인사드립니다. 서로 이웃으로 정보 공유하면서 소통해요~!'
+searchKeyword = '연남 데이트'
+bothBuddyMax = 100
+bothBuddyIntro = list()
+bothBuddyIntro.append('{nickname}님 안녕하세요~! 이초코와 최야삐입니다:) 저희는 커플 블로그로 활동중인데요~! 서로 이웃으로 데이트 정보 공유하면서 소통해요~!')
+bothBuddyIntro.append('안녕하세요, {nickname}님! 요즘 연남 홍대 쪽 데이트하고 있는데 좋은 곳 있으면 공유해봐요 ㅎ')
+bothBuddyIntro.append('{nickname}님, 반갑습니다! 저희는 커플 블로그로 활동하고 있는 평범한 커플인데요. 홍대나 신촌에 좋은 곳 공유하면서 지내봐요 ㅎㅎ')
+
 yourid = 'rhksdir12'
 yourpassword = 'tkfkdgo!!'
 
@@ -143,10 +179,12 @@ time.sleep(2)
 inputkeys(yourid, "아이디")
 inputkeys(yourpassword, "비밀번호")
 driver.find_element(By.XPATH, f"//input[@placeholder='비밀번호']").send_keys(Keys.ENTER)
-time.sleep(2)
+time.sleep(20)
 
 # 1. 네이버 view 키워드 검색(블로그/최신글)
 blogSearchUrl = "https://m.search.naver.com/search.naver?where=m_blog&query=" + searchKeyword + "&nso=so%3Add%2Cp%3Aall"
+##&nso=so%3Ar%2Cp%3Aall (관련)
+##&nso=so%3Add%2Cp%3Aall (최신)
 driver.get(blogSearchUrl)
 
 # 2. 원하는 수량 만큼 스크롤 진행(max 100)
@@ -184,10 +222,13 @@ for x in range(len(realID)):
     try:
         url = f"https://m.blog.naver.com/BuddyAddForm.naver?blogId={realID[x]}"
         openBlog(url)
+        # 서이추 한계치 여부 확인
+        maxCheck = checkMaxBuddy()
+        # 오류 여부도 체크
+        checkError = checkErrorPage()
         # 중복 신청 여부 확인
-
         checkDuplicated = checkDuplicatedBuddy()
-        if checkDuplicated == "true":
+        if checkDuplicated == "true" and checkError == "false":
             # 서이추 가능 여부 확인
             possibleCheck = checkBuddyPossible()
             # 이미 이웃 여부 확인
@@ -198,9 +239,13 @@ for x in range(len(realID)):
                 clickBuddyRadio()
                 nic = driver.find_elements(By.XPATH, '//em[@ng-bind-html="bafCtrl.buddyBlog.nickNameOrBlogId"]')
                 nic = nic[0].text
+
+                #서이추 그룹 선택
+                changeBuddyGroup(4)
+
                 # 서이추 인사말 복사
                 introBuddy(nic)
-
+                time.sleep(random.uniform(2, 5))
                 # 서이추 확인 버튼클릭
                 clickOkBtn()
                 buddyCnt += 1

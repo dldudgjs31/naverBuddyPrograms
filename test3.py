@@ -150,6 +150,7 @@ class bott():
         self.worker.start()
         self.worker.finished.connect(self.evt_worker_finished)
         self.worker.signal.connect(self.evt_update)
+        self.worker.progress.connect()
     def evt_worker_finished(self):
         try:
             ui.plainTextEdit_log.appendPlainText("test")
@@ -158,6 +159,8 @@ class bott():
     def evt_update(self,val):
         ui.plainTextEdit_log.appendPlainText(val)
 
+    def evt_progress_update(self,val):
+        ui.progressBar.setValue(val)
 class Worker(QThread):
     signal = pyqtSignal(str)
     progress = pyqtSignal(int)
