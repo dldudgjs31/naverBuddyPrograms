@@ -81,15 +81,48 @@
      <widget class="QPushButton" name="pushButton_save_api">
       <property name="geometry">
        <rect>
-        <x>490</x>
-        <y>80</y>
-        <width>100</width>
-        <height>31</height>
+        <x>270</x>
+        <y>190</y>
+        <width>151</width>
+        <height>41</height>
        </rect>
       </property>
       <property name="text">
        <string>저장</string>
       </property>
+     </widget>
+     <widget class="QLabel" name="label_16">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>140</y>
+        <width>101</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>openAI model  : </string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox">
+      <property name="geometry">
+       <rect>
+        <x>210</x>
+        <y>140</y>
+        <width>281</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <item>
+       <property name="text">
+        <string>[chatgpt 3.5] text-davinci-003</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>[chatgpt 4] gpt-4</string>
+       </property>
+      </item>
      </widget>
     </widget>
     <widget class="QWidget" name="tab">
