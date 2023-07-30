@@ -80,6 +80,21 @@ class bott():
                 self.user_id = id
                 self.user_start_dt = start_dt
                 self.user_end_dt = end_dt
+
+                ui.pushButton_logout.show()
+                ui.pushButton_buddy.show()
+                ui.pushButton_sympathy.show()
+                ui.pushButton_buddymanage.show()
+                ui.pushButton_stop.show()
+                ui.label_enddate.show()
+                ui.label_enddate2.show()
+                ui.label_enddate2.setText(str(end_dt))
+                ui.label_id.show()
+                ui.label_id2.show()
+                ui.label_id2.setText(str(id))
+
+
+
             else:
                 print(f"해당 계정 만료일 : {end_dt}")
                 msgBox.setText(f"해당 계정 만료일 : {end_dt}")
@@ -120,6 +135,7 @@ class bott():
             print(nickname)
             print(real_id)
             ui.plainTextEdit_log.appendPlainText(f"'{keyword}' 키워드 검색 완료")
+
             buddy_cnt = 0
             num_cnt = 0
             # while buddy_cnt < max_buddies:
@@ -151,5 +167,15 @@ if __name__ == "__main__":
     bot = bott()
     ui.pushButton_login.clicked.connect(bot.login)
     ui.pushButton_start.clicked.connect(bot.start)
+    ui.pushButton_logout.hide()
+    ui.pushButton_buddy.hide()
+    ui.pushButton_sympathy.hide()
+    ui.pushButton_buddymanage.hide()
+    ui.pushButton_stop.hide()
+    ui.label_enddate.hide()
+    ui.label_enddate2.hide()
+    ui.label_id.hide()
+    ui.label_id2.hide()
+
     MainWindow.show()
     sys.exit(app.exec())

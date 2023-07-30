@@ -28,10 +28,10 @@ class NaverBlogBuddyBot:
         pp.copy(my_id)
         id_input = self.driver.find_element(By.XPATH, f"//input[@placeholder='{placeholder}']")
         id_input.click()
-        time.sleep(2)
+        time.sleep(3)
         pp.copy(my_id)
-        time.sleep(2)
-        id_input.send_keys(Keys.CONTROL, 'v')
+        time.sleep(3)
+        id_input.send_keys(Keys.COMMAND, 'v')
 
     def open_blog(self, url):
         self.driver.execute_script(f"window.open('{url}');")
@@ -71,8 +71,8 @@ class NaverBlogBuddyBot:
         pp.copy(self.buddy_intro.format(nickname=nickname))
         message = self.driver.find_elements(By.XPATH, "//textarea[@ng-model='data.inviteMessage']")
         message[0].click()
-        message[0].send_keys(Keys.CONTROL, 'a')
-        message[0].send_keys(Keys.CONTROL, 'v')
+        message[0].send_keys(Keys.COMMAND, 'a')
+        message[0].send_keys(Keys.COMMAND, 'v')
 
     def check_duplicated_buddy(self):
         try:
