@@ -2,7 +2,7 @@ from PyQt6 import QtCore, QtWidgets
 from PyQt6.QtCore import *
 import chatgpt
 from buddy import *
-from PyQt6.QtWidgets import QPushButton, QMessageBox
+from PyQt6.QtWidgets import QPushButton, QMessageBox, QRadioButton
 import pymysql
 import threading
 
@@ -18,6 +18,17 @@ class bott():
     # 오류 해결사 함수
     def errorSolution(self):
         print("error")
+        #유효성 체크
+        #유효성 체크 1) 오류 코드 작성 여부
+        err_code = ui.plainTextEdit_err.toPlainText()
+        if err_code=='':
+            msgBox = QMessageBox()
+            msgBox.setText("오류 코드를 입력하세요.")
+            msgBox.exec()
+            return
+        #유효성 체크 2) 언어 선택 여부 확인
+
+
 
     # 쿼리 메이커 함수
     def querySolution(self):
@@ -63,10 +74,11 @@ if __name__ == "__main__":
     ##chat-gpt api key 등록
     ui.pushButton_save_api.clicked.connect(bot.saveApiKey)
     ##오류 해결사) 오류 분석
-    ui.pushButton_save_api.clicked.connect(bot.errorSolution)
+    ui.radioButton_err_java.setChecked(True)
+    ui.pushButton_err_sol.clicked.connect(bot.errorSolution)
     ##쿼리 메이커) 쿼리 생성
-    ui.pushButton_save_api.clicked.connect(bot.querySolution)
+    ui.pushButton_query.clicked.connect(bot.querySolution)
     ##함수 메이커) 함수 생성
-    ui.pushButton_save_api.clicked.connect(bot.functionSolution)
+    ui.pushButton_func_make.clicked.connect(bot.functionSolution)
     MainWindow.show()
     sys.exit(app.exec())
