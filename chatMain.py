@@ -8,10 +8,41 @@ import threading
 
 
 class bott():
-    chatgpt_api_key =''
+    #전역 변수 : API KEY / MODEL 유형
+    chatgpt_api_key = ''
+    chatgpt_api_model = ''
+
+    #api key 와 model 필수 값 validation 체크
+    def validSetting(self):
+        if self.chatgpt_api_key =='':
+            msgBox = QMessageBox()
+            msgBox.setText("API KEY를 입력하세요.")
+            msgBox.exec()
+            return True
+        elif self.chatgpt_api_model  =='':
+            msgBox = QMessageBox()
+            msgBox.setText("CHATGPT MODEL를 입력하세요.")
+            msgBox.exec()
+            return True
+        else:
+            return False
+
+    def validCheck(self,text,type):
+        if text =='':
+            msgBox = QMessageBox()
+            msgBox.setText(f"{type}을(를) 입력하세요.")
+            msgBox.exec()
+            return True
+        else:
+            return False
+
 
     def saveApiKey(self):
-        chatgpt_api_key = ui.lineEdit_apikey.text()
+        #api key 와 model 유형 선택
+        self.chatgpt_api_key = ui.lineEdit_apikey.text()
+        start_index = ui.comboBox.currentText().find(']')+1
+        model= ui.comboBox.currentText()[start_index:].strip()
+        self.chatgpt_api_model = model
         msgBox = QMessageBox()
         msgBox.setText("chat gpt key가 등록되었습니다.")
         msgBox.exec()
@@ -19,14 +50,37 @@ class bott():
     def errorSolution(self):
         print("error")
         #유효성 체크
-        #유효성 체크 1) 오류 코드 작성 여부
-        err_code = ui.plainTextEdit_err.toPlainText()
-        if err_code=='':
-            msgBox = QMessageBox()
-            msgBox.setText("오류 코드를 입력하세요.")
-            msgBox.exec()
+        # 유효성 체크 1) api-key 및 유형 선택 여부
+        if self.validSetting():
             return
-        #유효성 체크 2) 언어 선택 여부 확인
+
+        #유효성 체크 2) 오류 코드 작성 여부
+        err_code = ui.plainTextEdit_err.toPlainText()
+        if self.validCheck(text=err_code,type="에러코드"):
+            return
+
+        #선택된 언어
+        prgLanguage=''
+        if ui.radioButton_err_java.isChecked():
+            prgLanguage = ui.radioButton_err_java.text()
+        elif ui.radioButton_err_py.isChecked():
+            prgLanguage = ui.radioButton_err_py.text()
+        elif ui.radioButton_err_c.isChecked():
+            prgLanguage = ui.radioButton_err_c.text()
+        elif ui.radioButton_err_cpl.isChecked():
+            prgLanguage = ui.radioButton_err_cpl.text()
+        elif ui.radioButton_err_js.isChecked():
+            prgLanguage = ui.radioButton_err_js.text()
+
+        #prompt 설정
+        prompt = f"{prgLanguage}에서 발생한 에러 {err_code} 의 에러 원인과 해결 방안에 대해서 설명해줘."
+        print(prompt)
+
+        #CHAT GPT 함수 실행
+        result = ''
+
+        #결과값 입력
+        ui.plainTextEdit_err_sol.appendPlainText(result)
 
 
 
